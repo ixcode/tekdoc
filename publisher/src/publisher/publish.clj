@@ -28,34 +28,45 @@
                  (file-seq (file dirpath)))))
 
 ;; hmtl files are treated as selmer (like jinja) templates)
-(def content-files-pattern #".*\.(md|jade|html|jpg|png)$")
+(def content-files-pattern #"(?!.*README.md).*\.(md|jade|html|jpg|png)$")
+;; (re-matches content-files-pattern "README.md")
+;; (re-matches content-files-pattern "foo.md")
+;; (re-matches content-files-pattern "foo/bar/README.md")
 
 
 (defn extract-page-id [filepath]
   (:file-path-without-extension (parse-filepath filepath)))
 
-(defn page-file [file]
+(defn page-file [content-root file]
   (let [filepath (.getPath file)
-        file-details (parse-filepath filepath)]
+        file-details (parse-filepath filepath)
+        relative-path (clojure.string/replace (:filepath-without-extension file-details) content-root "")]
     {:filepath filepath
      :name (:name file-details)
      :filename (:filename file-details)
-     :page-id (:filepath-without-extension file-details)
+     :page-id relative-path
+     :relative-filename (str relative-path "." (:extension file-details))
      :type (keyword (:extension file-details))}))
 
-(defn list-page-files [root-dir]
-  (map #(page-file %) (walk root-dir content-files-pattern)))
+(defn list-page-files [content-root]
+  (map (partial page-file content-root) (walk content-root content-files-pattern)))
+
+(defn make-output-file [export-root page-file extension]
+  (str export-root (:page-id page-file) "." (name extension)))
 
 (defmulti process-page (fn [export-root page-file] (:type page-file)))
 
-(defmethod process-page :md [export-root page-file]
-  (println (str "Writing markdown file " page-file " to  " export-root)))
-
-(defmethod process-page :html [export-root page-file]
-  (println (str "Writing a selmer template " page-file " to " export-root)))
-
 (defmethod process-page :default [export-root page-file]
   (throw (IllegalArgumentException. (str "Could not process a file of type " (:type page-file)))))
+
+(defmethod process-page :md [export-root page-file]
+  (let [output-file (make-output-file export-root page-file :html)]
+    (println (str "[selmer  ] " (:relative-filename page-file) " -> " output-file))))
+
+(defmethod process-page :html [export-root page-file]
+  (let [output-file (make-output-file export-root page-file :html)]
+    (println (str "[markdown] " (:relative-filename page-file) " -> " output-file))))
+
 
 ;;(def test-page {:type :html})
 
@@ -67,3 +78,4 @@
 (defn export-site [export-root content-root]
   (process-page-files export-root (list-page-files config/content-root)))
 
+;; (export-site config/output-root config/content-root)
