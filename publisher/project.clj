@@ -19,7 +19,8 @@
                  [endjinn "0.1.0-SNAPSHOT"]
                  [dk.ative/docjure "1.6.0"]
                  [selmer "1.0.4"]
-                 [clj-jade "0.1.7"]]
+                 [clj-jade "0.1.7"]
+                 [clj-time "0.11.0"]]
   :ring {:handler publisher.server/app}
   :plugins [[lein-midje "2.0.1"]
             [lein-ring "0.7.3"]]

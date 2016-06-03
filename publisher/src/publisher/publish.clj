@@ -6,7 +6,8 @@
             [compojure.route :as route]
             [ring.adapter.jetty :as jetty]            
             [clj-jade.core :as jade]
-            [publisher.config :as config]))
+            [publisher.config :as config]
+            [selmer.parser :as selmer]))
 
 
 (defn parse-filepath [filepath]
@@ -52,7 +53,7 @@
   (map (partial page-file content-root) (walk content-root content-files-pattern)))
 
 (defn make-output-file [export-root page-file extension]
-  (str export-root (:page-id page-file) "." (name extension)))
+  (clojure.java.io/file  (str export-root (:page-id page-file) "." (name extension))))
 
 (defmulti process-page (fn [export-root page-file] (:type page-file)))
 
@@ -61,11 +62,18 @@
 
 (defmethod process-page :md [export-root page-file]
   (let [output-file (make-output-file export-root page-file :html)]
-    (println (str "[selmer  ] " (:relative-filename page-file) " -> " output-file))))
+    (println (str "[markdown] " (:relative-filename page-file) " -> " output-file))))
+
+(def page-context
+  {:page {
+          :publish {:timestamp (str (new java.util.Date))}
+          :source "gitlab/foo/bar"}})
 
 (defmethod process-page :html [export-root page-file]
   (let [output-file (make-output-file export-root page-file :html)]
-    (println (str "[markdown] " (:relative-filename page-file) " -> " output-file))))
+    (.createNewFile output-file)
+    (println (str "[selmer  ] " (:relative-filename page-file) " -> " output-file))
+    (spit output-file (selmer/render-file  (:relative-filename page-file) page-context ))))
 
 
 ;;(def test-page {:type :html})
@@ -76,6 +84,8 @@
 
 
 (defn export-site [export-root content-root]
+  (.mkdirs (clojure.java.io/file export-root))
+  (println "Going to be generating output in " export-root)
   (process-page-files export-root (list-page-files config/content-root)))
 
 ;; (export-site config/output-root config/content-root)
