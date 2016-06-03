@@ -14,13 +14,15 @@
   (let [regex #"((.*\/)*)(.+)\.(.*)$"
         match (re-matches regex filepath)
         path (nth match 1)
-        filename (nth match 3)
+        name (nth match 3)
         extension (nth match 4)
-        filepath-without-extension (format "%s%s" path filename)]
+        filepath-without-extension (format "%s%s" path name)
+        filename (format "%s.%s" name extension)]
     {:path path
-     :filename filename
+     :name name
      :extension extension
-     :filepath-without-extension filepath-without-extension}))
+     :filepath-without-extension filepath-without-extension
+     :filename filename}))
 
 (defn walk [dirpath pattern]
   (doall (filter #(re-matches pattern (.getPath %))
@@ -31,17 +33,19 @@
 
 
 (defn extract-page-id [filepath]
-  (:full-path-without-extension (parse-filepath filepath)))
+  (:file-path-without-extension (parse-filepath filepath)))
 
-(defn list-page-ids [root-dir]
-  (map extract-page-id (walk root-dir valid-content-files)))
+(defn page-file [file]
+  (let [filepath (.getPath file)
+        file-details (parse-filepath filepath)]
+    {:filepath filepath
+     :filename (:filename file-details)
+     :page-id (:filepath-without-extension file-details)
+     :type (keyword (:extension file-details))}))
+
+(def list-of-page-files (map #(page-file %) (walk config/content-root content-files-pattern)))
+
 
 (defn export-site [root-dir, export-dir]
   )
 
-
-(def list-of-content-files (map #(.getPath %) (walk config/content-root content-files-pattern)))
-
-
-
-;;(.getPath  (as-file "doctek/public/index.jade"))
