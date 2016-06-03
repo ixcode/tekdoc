@@ -1,17 +1,13 @@
 (ns publisher.publish
-  (:use [compojure.core]
-        [ring.util.response]
-        [markdown.core]
+  (:use [markdown.core]
         [clojure.java.io]
-        [publisher.render]
-        [publisher.config])
+        [publisher.render])
   (:require [compojure.handler :as handler]
             [ring.middleware.json :as middleware]
             [compojure.route :as route]
             [ring.adapter.jetty :as jetty]            
-            [clj-jade.core :as jade]))
-
-
+            [clj-jade.core :as jade]
+            [publisher.config :as config]))
 
 
 (defn parse-filepath [filepath]
@@ -30,8 +26,9 @@
   (doall (filter #(re-matches pattern (.getPath %))
                  (file-seq (file dirpath)))))
 
-(def match-all #".*\.(md|jade)$")
-(def valid-content-files #"([a-z0-9\.\-]*\/)*([a-z0-9\.\-]+)\.(md|jade|html)$")
+;; hmtl files are treated as selmer (like jinja) templates)
+(def content-files-pattern #".*\.(md|jade|html|jpg|png)$")
+
 
 (defn extract-page-id [filepath]
   (:full-path-without-extension (parse-filepath filepath)))
@@ -42,7 +39,8 @@
 (defn export-site [root-dir, export-dir]
   )
 
-;;(map #(println (.getPath %)) (walk "doctek/public" match-not-underscores))
+
+(def list-of-content-files (map #(.getPath %) (walk config/content-root content-files-pattern)))
 
 
 

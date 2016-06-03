@@ -1,5 +1,5 @@
 (ns publisher.config
-  (:reqiure [clj-yaml.core :as yaml]))
+  (:require [clj-yaml.core :as yaml]))
 
 
 (def page-context {:page {:publish {:timestamp "2016-05-31"} :source "https://gitlab.some/source.html"}})
@@ -10,9 +10,24 @@
     s))
 
 (def tekdoc-config (first (yaml/parse-string (slurp (expand-home "~/.tekdoc.yml")))))
-
-(def publish-site-config (first (yaml/parse-string (slurp (:test-site tekdoc-config)))))
-(selmer.parser/set-resource-path! (:content publish-site-config))
+(def site-config (first (yaml/parse-string (slurp (:test-site tekdoc-config)))))
 
 
+(defn resolve-relative-path [tekdoc-config-file relative-path]
+  (let [root-path (.getParent (clojure.java.io/file tekdoc-config-file))]
+    (.getCanonicalPath (clojure.java.io/file (str  root-path "/" relative-path)))))
+
+(defn path-from-config [key]
+  (resolve-relative-path (:test-site tekdoc-config) (key site-config)))
+
+(def content-root (path-from-config :content))
+(def static-root (path-from-config :static))
+(def output-root (path-from-config :output))
+
+
+
+(selmer.parser/set-resource-path! content-root)
+
+;; We never want caching on for now
 (selmer.parser/cache-off!)
+
