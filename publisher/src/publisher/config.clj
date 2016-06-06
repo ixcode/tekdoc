@@ -1,5 +1,6 @@
 (ns publisher.config
-  (:require [clj-yaml.core :as yaml]))
+  (:require [selmer.parser :as selmer]
+            [clj-yaml.core :as yaml]))
 
 
 (def page-context {:page {:publish {:timestamp "2016-05-31"} :source "https://gitlab.some/source.html"}})
@@ -26,8 +27,8 @@
 
 
 
-(selmer.parser/set-resource-path! content-root)
+(selmer/set-resource-path! content-root)
 
 ;; We never want caching on for now
-(selmer.parser/cache-off!)
+(selmer/cache-off!)
 

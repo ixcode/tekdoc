@@ -19,7 +19,8 @@
 (defn template-filename-for [page-id template-type]
   (format "doctek/public/%s.%s" page-id (name template-type)))
 
-(def data (yaml/parse-string (slurp "doctek/public/_data.yml")))
+;;(def data (yaml/parse-string (slurp "doctek/public/_data.yml")))
+(def data {})
 
 (defn empty-map-for-nil [value]
   (if (nil? value)

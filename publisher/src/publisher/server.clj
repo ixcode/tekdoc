@@ -3,8 +3,7 @@
         [ring.util.response]
         [markdown.core]
         [clojure.java.io]
-        [publisher.render]
-        [publisher.publish])
+        [publisher.render])
   (:require [compojure.handler :as handler]
             [ring.middleware.json :as middleware]
             [compojure.route :as route]

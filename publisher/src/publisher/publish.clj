@@ -85,7 +85,13 @@
 
 (defn export-site [export-root content-root]
   (.mkdirs (clojure.java.io/file export-root))
-  (println "Going to be generating output in " export-root)
   (process-page-files export-root (list-page-files config/content-root)))
 
 ;; (export-site config/output-root config/content-root)
+
+(defn -main [& args]
+  (println "Going to publish the site...")
+  (println "Content : " config/content-root)
+  (println "Output  : " config/output-root)
+  (export-site config/output-root config/content-root)
+)

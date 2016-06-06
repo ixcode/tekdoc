@@ -25,5 +25,12 @@
   :plugins [[lein-midje "2.0.1"]
             [lein-ring "0.7.3"]]
   :main publisher.server
-)
+
+  :aot [publisher.server publisher.publish]
+  :profiles {:preview {:main publisher.server}
+             :publish {:main publisher.publish}}
+                
+  :aliases {"preview" ["with-profile" "preview" "run"]
+            "publish" ["with-profile" "publish" "run"]}
+  )
 
