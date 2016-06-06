@@ -7,7 +7,8 @@
             [ring.adapter.jetty :as jetty]            
             [clj-jade.core :as jade]
             [publisher.config :as config]
-            [selmer.parser :as selmer]))
+            [selmer.parser :as selmer])
+  (:gen-class))
 
 
 (defn parse-filepath [filepath]
