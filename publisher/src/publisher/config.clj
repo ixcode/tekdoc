@@ -26,9 +26,9 @@
 (def output-root (path-from-config :output))
 
 
+(defn initialise! [site-config-file]  
+  (selmer/set-resource-path! content-root)
 
-(selmer/set-resource-path! content-root)
-
-;; We never want caching on for now
-(selmer/cache-off!)
+  ;; We never want caching on for now
+  (selmer/cache-off!))
 

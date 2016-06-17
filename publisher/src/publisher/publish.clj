@@ -1,13 +1,15 @@
 (ns publisher.publish
-  (:use [markdown.core]
-        [clojure.java.io])
-  (:require [compojure.handler :as handler]
+  (:use [markdown.core])
+  (:require [clojure.java.io :as io]
+            [compojure.handler :as handler]
             [ring.middleware.json :as middleware]
             [compojure.route :as route]
             [ring.adapter.jetty :as jetty]            
             [clj-jade.core :as jade]
             [publisher.config :as config]
-            [selmer.parser :as selmer])
+            [selmer.parser :as selmer]
+            [me.raynes.fs :as fs]
+            )
   (:gen-class))
 
 
@@ -27,7 +29,7 @@
 
 (defn walk [dirpath pattern]
   (doall (filter #(re-matches pattern (.getPath %))
-                 (file-seq (file dirpath)))))
+                 (file-seq (io/file dirpath)))))
 
 ;; hmtl files are treated as selmer (like jinja) templates)
 (def content-files-pattern #"(?!.*README.md).*\.(md|jade|html|jpg|png)$")
@@ -83,16 +85,33 @@
 (defn process-page-files [export-root page-files]
   (dorun (map (partial process-page export-root) page-files)))
 
+(defn valid-file? [input-file]
+  (not (fs/hidden? input-file)))
+
+(defn copy-static [output-root input-file]
+  (println "processing-static-file: " (.getAbsolutePath input-file))
+  (if (valid-file? input-file) 
+    (if (fs/directory? input-file)
+      (fs/copy-dir input-file output-root)
+      (fs/copy input-file (fs/file output-root (.getName input-file))))))
+
+(defn copy-static-site-files [static-root output-root]
+  (let [list-of-files (fs/list-dir static-root)]
+    (dorun (map (partial copy-static output-root) list-of-files))))
 
 (defn export-site [export-root content-root]
   (.mkdirs (clojure.java.io/file export-root))
+  (fs/delete-dir config/output-root)
+  (fs/mkdirs config/output-root)
+  (copy-static-site-files config/static-root config/output-root)
   (process-page-files export-root (list-page-files config/content-root)))
 
-;; (export-site config/output-root config/content-root)
-
 (defn -main [& args]
+  (let [site-config-file (first args)]
+    (config/initialise! site-config-file))
   (println "Going to publish the site...")
-  (println "Content : " config/content-root)
-  (println "Output  : " config/output-root)
+  (println "Content        : " config/content-root)
+  (println "Static Content : " config/static-root)
+  (println "Output         : " config/output-root)
   (export-site config/output-root config/content-root)
 )
