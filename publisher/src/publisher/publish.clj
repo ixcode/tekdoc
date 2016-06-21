@@ -12,6 +12,10 @@
             )
   (:gen-class))
 
+(defn swap-md-for-html [input-string]
+  (-> (clojure.string/replace input-string ".md)" ".html)")
+      (clojure.string/replace ".md#" ".html#")))
+    
 
 (defn parse-filepath [filepath]
   (let [regex #"((.*\/)*)(.+)\.(.*)$"
@@ -67,7 +71,8 @@
   (let [output-file (make-output-file export-root page-file :html)]
     (println (str "[markdown] " (:relative-filename page-file) " -> " output-file))
     (fs/mkdirs (fs/parent output-file))
-    (spit output-file (md/md-to-html-string (slurp (:filepath page-file))))))
+    (spit output-file (md/md-to-html-string (->> (slurp (:filepath page-file))
+                                                 (swap-md-for-html))))))
 
 (defmethod process-page :png [export-root page-file]
   (let [output-file (make-output-file export-root page-file :png)]

@@ -11,9 +11,8 @@
                  [clj-http "0.6.3"]
                  [compojure "1.1.1"]
                  [ring-mock "0.1.3"]
-                 [markdown-clj "0.9.65"]
+                 [markdown-clj "0.9.89"]
                  [ring/ring-json "0.1.2"]
-                 [markdown-clj "0.9.66"]
                  [ring/ring-jetty-adapter "1.1.7" :exclusions [org.slf4j/slf4j-nop
                                                                org.slf4j/slf4j-log4j12]]
                  [endjinn "0.1.0-SNAPSHOT"]
