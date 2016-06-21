@@ -69,6 +69,11 @@
     (fs/mkdirs (fs/parent output-file))
     (spit output-file (md/md-to-html-string (slurp (:filepath page-file))))))
 
+(defmethod process-page :png [export-root page-file]
+  (let [output-file (make-output-file export-root page-file :png)]
+    (println (str "[png] " (:relative-filename page-file) " -> " output-file))
+    (fs/copy (:filepath page-file) output-file)))
+
 (def page-context
   {:page {
           :publish {:timestamp (str (new java.util.Date))}
