@@ -1,5 +1,4 @@
 (ns publisher.publish
-  (:use [markdown.core])
   (:require [clojure.java.io :as io]
             [compojure.handler :as handler]
             [ring.middleware.json :as middleware]
@@ -9,6 +8,7 @@
             [publisher.config :as config]
             [selmer.parser :as selmer]
             [me.raynes.fs :as fs]
+            [markdown.core :as md]
             )
   (:gen-class))
 
@@ -65,7 +65,9 @@
 
 (defmethod process-page :md [export-root page-file]
   (let [output-file (make-output-file export-root page-file :html)]
-    (println (str "[markdown] " (:relative-filename page-file) " -> " output-file))))
+    (println (str "[markdown] " (:relative-filename page-file) " -> " output-file))
+    (fs/mkdirs (fs/parent output-file))
+    (spit output-file (md/md-to-html-string (slurp (:filepath page-file))))))
 
 (def page-context
   {:page {
