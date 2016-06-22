@@ -1,6 +1,7 @@
 (ns publisher.config
   (:require [selmer.parser :as selmer]
-            [clj-yaml.core :as yaml]))
+            [clj-yaml.core :as yaml]
+            [clj-jade.core :as jade]))
 
 
 (def page-context {:page {:publish {:timestamp "2016-05-31"} :source "https://gitlab.some/source.html"}})
@@ -24,11 +25,16 @@
 (def content-root (path-from-config :content))
 (def static-root (path-from-config :static))
 (def output-root (path-from-config :output))
+(def layout-root (path-from-config :layouts))
 
 
 (defn initialise! [site-config-file]  
   (selmer/set-resource-path! content-root)
 
   ;; We never want caching on for now
-  (selmer/cache-off!))
+  (selmer/cache-off!)
+
+  (jade/configure {:template-dir content-root
+                 :pretty-print true
+                 :cache? false}))
 

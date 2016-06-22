@@ -62,6 +62,13 @@
 (defn make-output-file [export-root page-file extension]
   (clojure.java.io/file  (str export-root (:page-id page-file) "." (name extension))))
 
+
+(def page-context
+  {:page {
+          :publish {:timestamp (str (new java.util.Date))}
+          :source "gitlab/foo/bar"}})
+
+
 (defmulti process-page (fn [export-root page-file] (:type page-file)))
 
 (defmethod process-page :default [export-root page-file]
@@ -74,15 +81,19 @@
     (spit output-file (md/md-to-html-string (->> (slurp (:filepath page-file))
                                                  (swap-md-for-html))))))
 
+(defmethod process-page :jade [export-root page-file]
+  (let [output-file (make-output-file export-root page-file :html)
+        rendered-content (jade/render (:relative-filename page-file) page-context)]
+    (println (str "[jade] " (:relative-filename page-file) " -> " output-file))
+    (fs/mkdirs (fs/parent output-file))
+    (spit output-file rendered-content)))
+
+
 (defmethod process-page :png [export-root page-file]
   (let [output-file (make-output-file export-root page-file :png)]
     (println (str "[png] " (:relative-filename page-file) " -> " output-file))
     (fs/copy (:filepath page-file) output-file)))
 
-(def page-context
-  {:page {
-          :publish {:timestamp (str (new java.util.Date))}
-          :source "gitlab/foo/bar"}})
 
 (defmethod process-page :html [export-root page-file]
   (let [output-file (make-output-file export-root page-file :html)]
