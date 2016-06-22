@@ -6,6 +6,7 @@ It's mostly a static site generator based around markdown, but it has some core 
 
 # TODO
 
-- Convert inline markdown references to be "html" that way they will work when viewed in github and on the site.
-- Provide a way to deep link to a location in another md file - e.g. glossaries
+- Provide a way to deep link to a location in another md file - e.g. glossaries - need an anchor
 - Provide a glossary concept so you don't have to build the link manually for every word you want to glossarise.
+- Allow _layouts to live outside the content dir? OR move static files into the content dir. Might mean things render more naturally?
+- Make it possible to refer to a layout in extends by aboslute path?
