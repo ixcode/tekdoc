@@ -10,3 +10,5 @@ It's mostly a static site generator based around markdown, but it has some core 
 - Provide a glossary concept so you don't have to build the link manually for every word you want to glossarise.
 - Allow _layouts to live outside the content dir? OR move static files into the content dir. Might mean things render more naturally?
 - Make it possible to refer to a layout in extends by aboslute path?
+
+- Make it so that when you publish you don't destroy the python server because youve deleted the output root

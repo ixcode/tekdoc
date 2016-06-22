@@ -75,18 +75,20 @@
   (throw (IllegalArgumentException. (str "Could not process a file of type " (:type page-file)))))
 
 (defmethod process-page :md [export-root page-file]
-  (let [output-file (make-output-file export-root page-file :html)]
+  (let [output-file (make-output-file export-root page-file :html)
+        rendered-md (md/md-to-html-string (->> (slurp (:filepath page-file))
+                                               (swap-md-for-html)))
+        rendered-page (jade/render "_layouts/md-page-default.jade" {:content rendered-md})]
     (println (str "[markdown] " (:relative-filename page-file) " -> " output-file))
     (fs/mkdirs (fs/parent output-file))
-    (spit output-file (md/md-to-html-string (->> (slurp (:filepath page-file))
-                                                 (swap-md-for-html))))))
+    (spit output-file rendered-page)))
 
 (defmethod process-page :jade [export-root page-file]
   (let [output-file (make-output-file export-root page-file :html)
-        rendered-content (jade/render (:relative-filename page-file) page-context)]
+        rendered-page (jade/render (:relative-filename page-file) page-context)]
     (println (str "[jade] " (:relative-filename page-file) " -> " output-file))
     (fs/mkdirs (fs/parent output-file))
-    (spit output-file rendered-content)))
+    (spit output-file rendered-page)))
 
 
 (defmethod process-page :png [export-root page-file]
