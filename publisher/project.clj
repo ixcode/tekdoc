@@ -15,7 +15,6 @@
                  [ring/ring-json "0.1.2"]
                  [ring/ring-jetty-adapter "1.1.7" :exclusions [org.slf4j/slf4j-nop
                                                                org.slf4j/slf4j-log4j12]]
-                 [endjinn "0.1.0-SNAPSHOT"]
                  [dk.ative/docjure "1.6.0"]
                  [selmer "1.0.4"]
                  [clj-jade "0.1.7"]
