@@ -78,7 +78,7 @@
   (let [output-file (make-output-file export-root page-file :html)
         rendered-md (md/md-to-html-string (->> (slurp (:filepath page-file))
                                                (swap-md-for-html)))
-        rendered-page (jade/render "_layouts/md-page-default.jade" {:content rendered-md})]
+        rendered-page (jade/render "_layouts/md-page-default.jade" (merge page-context {:content rendered-md}))]
     (println (str "[markdown] " (:relative-filename page-file) " -> " output-file))
     (fs/mkdirs (fs/parent output-file))
     (spit output-file rendered-page)))
