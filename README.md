@@ -35,3 +35,5 @@ Now you should be able to publish your site!
 - Make it so that when you publish you don't destroy the python server because youve deleted the output root
 
 - Implement a Preview serving live from the source to improve iteration time
+
+- Implement "publish spreadsheet" - specify a range in a sheet in a spreadsheet to extract and publish as a table. That way you can use the spreadsheet to maintain the underlying data.
