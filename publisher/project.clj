@@ -19,6 +19,7 @@
                  [selmer "1.0.4"]
                  [clj-jade "0.1.7"]
                  [clj-time "0.11.0"]
+                 [clj-http "3.1.0"]
                  [me.raynes/fs "1.4.6"]]
   :ring {:handler publisher.server/app}
   :plugins [[lein-midje "2.0.1"]
@@ -27,9 +28,11 @@
 
   :aot [publisher.server publisher.publish]
   :profiles {:preview {:main publisher.server}
-             :publish {:main publisher.publish}}
+             :publish {:main publisher.publish}
+             :ci {:main publisher.ci}}
                 
   :aliases {"preview" ["with-profile" "preview" "run"]
-            "publish" ["with-profile" "publish" "run"]}
+            "publish" ["with-profile" "publish" "run"]
+            "ci" ["with-profile" "ci" "run"]}
   )
 
