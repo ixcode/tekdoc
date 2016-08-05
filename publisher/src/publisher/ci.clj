@@ -9,7 +9,7 @@
   (:gen-class))
 
 (defn trigger-ci [request]
-  (println (pprint (slurp (:body  request))))
+  (pprint (:body  request))
   (response { :is ["message"] :text "Thanks for the data!"}))
 
 (defroutes app-routes
@@ -18,7 +18,7 @@
 (def app
   (-> (handler/site app-routes)
       (middleware/wrap-json-response)
-      ;;(middleware/wrap-json-body)
+      (middleware/wrap-json-body {:keywords? true})
       ))
 
 (defn -main [& args]
