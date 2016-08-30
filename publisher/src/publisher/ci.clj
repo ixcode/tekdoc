@@ -29,7 +29,7 @@
 
 (defn publish-site [output-root publish-root]
   (println "Copying site accross from " output-root " to " publish-root)
-  (exec-shell "rm" "-r" (format "%s/*"))
+  (exec-shell "rm" "-r" (format "%s/*" publish-root))
   (exec-shell "cp" "-R" (format "%s/*" output-root) publish-root))
 
 (defn trigger-ci [request]
