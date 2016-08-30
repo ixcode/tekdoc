@@ -28,7 +28,7 @@
 
 
 (defn publish-site [output-root publish-root]
-  (println "Copying site accross from " content-root " to " publish-root)
+  (println "Copying site accross from " output-root " to " publish-root)
   (exec-shell "rm" "-r" (format "%s/*"))
   (exec-shell "cp" "-R" (format "%s/*" output-root) publish-root))
 
