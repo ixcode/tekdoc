@@ -26,7 +26,7 @@
 (def static-root (path-from-config :static))
 (def output-root (path-from-config :output))
 (def layout-root (path-from-config :layouts))
-(def publish-root (path-from-config :publish))
+(def publish-root (:publish site-config))
 
 
 (defn initialise! [site-config-file]  
