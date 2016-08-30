@@ -12,22 +12,31 @@
             [ring.adapter.jetty :as jetty])
   (:gen-class))
 
+(defn exec-shell [& args]
+  (let [cmd-output (apply sh args)
+        out (:out cmd-output)]
+    (println out)
+    out))
+
 ;; TODO - should probably use git rev-parse and remember the last revision for more scientific comparison
-(defn pull-from-git [repository-url]
-  (let [cmd-output (sh "git" "pull" "--rebase" :dir repository-url)]
-    (if (str/starts-with? (:out cmd-output) "Current branch master is up to date.")
+(defn pull-from-git [content-root]
+  (println "Checking and updating repo @ " )
+  (let [out (exec-shell "git" "pull" "--rebase" :dir content-root)]
+    (if (str/starts-with? (:out out) "Current branch master is up to date.")
       { :up-to-date? true }
       { :up-to-date? false})))
 
-(defn update-source [content-root]
-  (println "Pulling from Git in " content-root)
-  (let [result (sh "git" "pull" "--rebase" :dir content-root)]
-       (println (:out result))))
+
+(defn publish-site [output-root publish-root]
+  (println "Copying site accross from " content-root " to " publish-root)
+  (exec-shell "rm" "-r" (format "%s/*"))
+  (exec-shell "cp" "-R" (format "%s/*" output-root) publish-root))
 
 (defn trigger-ci [request]
   (pprint (:body  request))
-  (update-source config/content-root)
+  (pull-from-git config/content-root)
   (publish/export-site config/output-root config/content-root)
+  (publish-site config/output-root config/publish-root)
   (response { :is ["message"] :text "Just published the website!"}))
 
 (defroutes app-routes
