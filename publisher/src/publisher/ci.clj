@@ -44,5 +44,5 @@
     (let [site-config-file (first args)]
     (config/initialise! site-config-file)))
     
-  (jetty/run-jetty app {:port 80})
+  (jetty/run-jetty app {:port 8087})
 )

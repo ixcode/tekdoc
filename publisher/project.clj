@@ -26,7 +26,7 @@
             [lein-ring "0.7.3"]]
   :main publisher.server
 
-  :aot [publisher.server publisher.publish]
+  :aot [publisher.server publisher.publish publisher.ci]
   :profiles {:preview {:main publisher.server}
              :publish {:main publisher.publish}
              :ci {:main publisher.ci}}
