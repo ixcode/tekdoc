@@ -19,8 +19,14 @@
       { :up-to-date? true }
       { :up-to-date? false})))
 
+(defn update-source [content-root]
+  (println "Pulling from Git in " content-root)
+  (let [result (sh "git" "pull" "--rebase" :dir content-root)]
+       (println (:out result))))
+
 (defn trigger-ci [request]
   (pprint (:body  request))
+  (update-source config/content-root)
   (publish/export-site config/output-root config/content-root)
   (response { :is ["message"] :text "Just published the website!"}))
 
@@ -38,5 +44,5 @@
     (let [site-config-file (first args)]
     (config/initialise! site-config-file)))
     
-  (jetty/run-jetty app {:port 8087})
+  (jetty/run-jetty app {:port 80})
 )
