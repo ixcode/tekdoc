@@ -7,15 +7,21 @@ SITE_CONFIG=$2
 
 install() {
     echo "tekdoc - Installing..."
-    mkdir ~/.tekdoc
+    mkdir -p ~/.tekdoc
     cp target/publisher-0.1.0-SNAPSHOT-standalone.jar ~/.tekdoc/tekdoc.jar
     cp tekdoc.sh ~/.tekdoc
 }
 
 publish() {
     echo "Using site config ${SITE_CONFIG}"
-    export JAVA_CMD="-cp ~/.tekdoc/tekdoc.jar publisher.publish"
+    #export JAVA_CMD="-cp ~/.tekdoc/tekdoc.jar publisher.publish"
     java -cp ~/.tekdoc/tekdoc.jar publisher.publish
+}
+
+ci() {
+    echo "Using site config ${SITE_CONFIG} going into CI mode"
+    #export JAVA_CMD="-cp ~/.tekdoc/tekdoc.jar publisher.publish"
+    java -cp ~/.tekdoc/tekdoc.jar publisher.ci ${SITE_CONFIG}
 }
 
 --help() {

@@ -72,7 +72,7 @@
 (defmulti process-page (fn [export-root page-file] (:type page-file)))
 
 (defmethod process-page :default [export-root page-file]
-  (throw (IllegalArgumentException. (str "Could not process a file of type " (:type page-file)))))
+  (println (str "Could not process a file of type " (:type page-file) ", ignoring.")))
 
 (defmethod process-page :md [export-root page-file]
   (let [output-file (make-output-file export-root page-file :html)
