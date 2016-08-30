@@ -22,7 +22,7 @@
 (defn pull-from-git [content-root]
   (println "Checking and updating repo @ " )
   (let [out (exec-shell "git" "pull" "--rebase" :dir content-root)]
-    (if (str/starts-with? (:out out) "Current branch master is up to date.")
+    (if (str/starts-with? out "Current branch master is up to date.")
       { :up-to-date? true }
       { :up-to-date? false})))
 
