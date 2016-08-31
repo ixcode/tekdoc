@@ -124,19 +124,25 @@
   (let [list-of-files (fs/list-dir static-root)]
     (dorun (map (partial copy-static output-root) list-of-files))))
 
+(defn print-config []
+  (println "Going to publish the site...")
+  (println "Content        : " config/content-root)
+  (println "Static Content : " config/static-root)
+  (println "Output         : " config/output-root))
+
 (defn export-site [export-root content-root]
+  (print-config)
   (.mkdirs (clojure.java.io/file export-root))
   (fs/delete-dir config/output-root)
   (fs/mkdirs config/output-root)
   (copy-static-site-files config/static-root config/output-root)
   (process-page-files export-root (list-page-files config/content-root)))
 
+
+
 (defn -main [& args]
   (let [site-config-file (first args)]
     (config/initialise! site-config-file))
-  (println "Going to publish the site...")
-  (println "Content        : " config/content-root)
-  (println "Static Content : " config/static-root)
-  (println "Output         : " config/output-root)
+  (print-config)
   (export-site config/output-root config/content-root)
 )

@@ -9,13 +9,26 @@
             [clojure.string :as str]
             [ring.middleware.json :as middleware]
             [compojure.route :as route]
-            [ring.adapter.jetty :as jetty])
+            [ring.adapter.jetty :as jetty]
+            [me.raynes.fs :as fs])
   (:gen-class))
 
 (defn exec-shell [& args]
   (let [cmd-output (apply sh args)
-        out (:out cmd-output)]
-    (println out)
+        out (:out cmd-output)
+        err (:err cmd-output)
+        exit (:exit cmd-output)]    
+    (println "executed " args)
+    (println "exit status: " exit)
+    (println "----------------------------------------------------------")
+    (println "stdout")   
+    (println out)    
+    (println "----------------------------------------------------------")
+    (println "stderr")
+    (println err)    
+    (println "----------------------------------------------------------")
+
+    
     out))
 
 ;; TODO - should probably use git rev-parse and remember the last revision for more scientific comparison
@@ -28,9 +41,14 @@
 
 
 (defn publish-site [output-root publish-root]
-  (println "Copying site accross from " output-root " to " publish-root)
-  (exec-shell "rm" "-r" (format "%s/*" publish-root))
-  (exec-shell "cp" "-R" (format "%s/*" output-root) publish-root))
+  (let [publish-pattern (format "%s/*" publish-root)
+        output-pattern (format "%s/" output-root)]
+    
+    (println "Removing files in [" publish-pattern "]")    
+    (exec-shell "sh" "-c" (format  "rm -rv %s" publish-pattern))
+    
+    (println "Copying site accross from [" output-pattern "] to [" publish-root "]")   
+    (exec-shell "sh" "-c" (format  "cp -Rv %s %s" output-pattern publish-root))))
 
 (defn trigger-ci [request]
   (pprint (:body  request))
