@@ -28,8 +28,17 @@
 (def layout-root (path-from-config :layouts))
 (def publish-root (:publish site-config))
 
+(defn print-config []
+  (println "---------------------------------------------------------------")
+  (println "Tekdoc - Config")
+  (println "Content        : " content-root)
+  (println "Static Content : " static-root)
+  (println "Output         : " output-root)
+  (println "Publish to     : " publish-root)
+  (println "---------------------------------------------------------------"))
 
-(defn initialise! [site-config-file]  
+(defn initialise! [site-config-file]
+  (print-config)
   (selmer/set-resource-path! content-root)
 
   ;; We never want caching on for now
