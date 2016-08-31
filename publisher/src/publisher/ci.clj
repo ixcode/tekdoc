@@ -40,9 +40,11 @@
       { :up-to-date? false})))
 
 
+;; See https://coderanch.com/t/423573/java/java/Passing-wilcard-Runtime-exec-command
+;; Wildcards are interpreted by the bash shell so you need to run that.
 (defn publish-site [output-root publish-root]
   (let [publish-pattern (format "%s/*" publish-root)
-        output-pattern (format "%s/" output-root)]
+        output-pattern (format "%s/*" output-root)]
     
     (println "Removing files in [" publish-pattern "]")    
     (exec-shell "sh" "-c" (format  "rm -rv %s" publish-pattern))
