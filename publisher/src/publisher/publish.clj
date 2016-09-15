@@ -76,9 +76,12 @@
 
 (defmethod process-page :md [export-root page-file]
   (let [output-file (make-output-file export-root page-file :html)
-        rendered-md (md/md-to-html-string (->> (slurp (:filepath page-file))
-                                               (swap-md-for-html)))
-        rendered-page (jade/render "_layouts/md-page-default.jade" (merge page-context {:content rendered-md}))]
+        rendered-md (md/md-to-html-string-with-meta (->> (slurp (:filepath page-file))
+                                                         (swap-md-for-html))
+                                                    :heading-anchors true)
+        html (:html rendered-md)
+        template-name (get :template (:metadata rendered-md) "md-page-default")
+        rendered-page (jade/render (format "_layouts/%s.jade" template-name) (merge page-context {:content html}))]
     (println (str "[markdown] " (:relative-filename page-file) " -> " output-file))
     (fs/mkdirs (fs/parent output-file))
     (spit output-file rendered-page)))

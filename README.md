@@ -23,6 +23,13 @@ You can then run a script `tekdoc.sh` which will copy this jarfile and script in
 
 	./tekdoc.sh install
 
+You need to create a config file to contain local config
+
+	~/.tekdok.yml
+
+	- test-site : <>
+
+
 Now you should be able to publish your site!
 
 # TODO
