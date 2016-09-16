@@ -68,7 +68,10 @@
           :publish {:timestamp (str (new java.util.Date))}
           :source "gitlab/foo/bar"}})
 
-
+;; To test:
+;; (def input-file (fs/file "some/path/to/a/source/file"))
+;; (def page (page-file config/content-root input-file))
+;; (process-page (fs/file config/output-root) page)
 (defmulti process-page (fn [export-root page-file] (:type page-file)))
 
 (defmethod process-page :default [export-root page-file]
@@ -80,9 +83,11 @@
                                                          (swap-md-for-html))
                                                     :heading-anchors true)
         html (:html rendered-md)
-        template-name (get :template (:metadata rendered-md) "md-page-default")
-        rendered-page (jade/render (format "_layouts/%s.jade" template-name) (merge page-context {:content html}))]
-    (println (str "[markdown] " (:relative-filename page-file) " -> " output-file))
+        template-meta (:template (:metadata rendered-md))
+        template-name (if (nil? template-meta) "md-page-default" (first template-meta))
+        template-file (format "_layouts/%s.jade" template-name)
+        rendered-page (jade/render template-file (merge page-context {:content html}))]
+    (println (str "[markdown] " (:relative-filename page-file) " -> " output-file " : " template-file))    
     (fs/mkdirs (fs/parent output-file))
     (spit output-file rendered-page)))
 
