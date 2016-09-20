@@ -1,0 +1,13 @@
+template: person-template
+data:
+  - id: '001'
+    name: Mr X
+    address: |
+      00 Xxxxx Xxxxx,
+      XXXXXX
+      XX0 0XX
+    job-title: Foo person
+    skillz:
+      - {id: 001, description: being awesome}
+      - {id: 002, description: eating crisps}
+      - {id: 003, description: drinking beer}

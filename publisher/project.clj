@@ -20,7 +20,8 @@
                  [clj-jade "0.1.7"]
                  [clj-time "0.11.0"]
                  [clj-http "3.1.0"]
-                 [me.raynes/fs "1.4.6"]]
+                 [me.raynes/fs "1.4.6"]
+                 [org.clojure/data.csv "0.1.3"]]
   :ring {:handler publisher.server/app}
   :plugins [[lein-midje "2.0.1"]
             [lein-ring "0.7.3"]]

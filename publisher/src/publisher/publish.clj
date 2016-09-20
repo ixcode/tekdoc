@@ -9,7 +9,8 @@
             [selmer.parser :as selmer]
             [me.raynes.fs :as fs]
             [markdown.core :as md]
-            )
+            [clj-yaml.core :as yaml]
+            [publisher.data-parse :as dp])
   (:gen-class))
 
 (defn swap-md-for-html [input-string]
@@ -50,6 +51,7 @@
         file-details (parse-filepath filepath)
         relative-path (clojure.string/replace (:filepath-without-extension file-details) content-root "")]
     {:filepath filepath
+     :dir (.getParent file)
      :name (:name file-details)
      :filename (:filename file-details)
      :page-id relative-path
@@ -111,6 +113,19 @@
     (println (str "[selmer  ] " (:relative-filename page-file) " -> " output-file))
     (spit output-file (selmer/render-file  (:relative-filename page-file) page-context ))))
 
+;;(def test-root ".../tekdoc/publisher/test/publisher")
+;;(def test-file (fs/file test-root "list-of-people.yaml"))
+;;(def p (page-file test-root test-file))
+(defmethod process-page :yaml [export-root page-file]
+  (let [{:keys [template data-spec]} (yaml/parse-string (slurp (:filepath page-file)))
+        {:keys [source join]} data-spec
+        insert-data (dp/load-data-from-tsv (str (:dir page-file) "/" source))
+        template-data (conj page-context {:data insert-data})
+        output-file (make-output-file export-root page-file :html)
+        rendered-page (jade/render (format "_layouts/%s.jade" template) template-data)]
+    (println (str "[yaml    ] " (:relative-filename page-file) " -> " output-file))
+    (fs/mkdirs (fs/parent output-file))
+    (spit output-file rendered-page)))
 
 ;;(def test-page {:type :html})
 

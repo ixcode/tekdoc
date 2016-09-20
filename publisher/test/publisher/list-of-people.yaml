@@ -1,0 +1,6 @@
+template: person-template
+data-spec:
+  source: people.tsv
+  join:
+    - source: addresses.tsv
+      join-on: ["Person Id", "people.tsv#Id"] 
