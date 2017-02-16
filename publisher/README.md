@@ -20,4 +20,13 @@ You need to install the tekdoc.service file in `/usr/lib/systemd/system/tekdoc.s
 
 You can follow the logs here:
 
-	journalctl -fu tekdoc.service 
+	journalctl -fu tekdoc.service
+
+## Known Issues
+
+- Sometimes images don't seem to work: Unsure what this is but rm'ing them and then checking out again seemed to fix it. Originally I thought it was a capitalisation issue but it also happened with an all lowercase filename.
+
+
+
+
+

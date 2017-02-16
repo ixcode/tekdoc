@@ -11,40 +11,53 @@
     (clojure.string/replace-first s "~" (System/getProperty "user.home"))
     s))
 
-(def tekdoc-config (first (yaml/parse-string (slurp (expand-home "~/.tekdoc.yml")))))
-(def site-config (first (yaml/parse-string (slurp (:test-site tekdoc-config)))))
-
 
 (defn resolve-relative-path [tekdoc-config-file relative-path]
   (let [root-path (.getParent (clojure.java.io/file tekdoc-config-file))]
     (.getCanonicalPath (clojure.java.io/file (str  root-path "/" relative-path)))))
 
-(defn path-from-config [key]
-  (resolve-relative-path (:test-site tekdoc-config) (key site-config)))
+(def -config (atom {}))
+(defn get-config [] @-config)
 
-(def content-root (path-from-config :content))
-(def static-root (path-from-config :static))
-(def output-root (path-from-config :output))
-(def layout-root (path-from-config :layouts))
-(def publish-root (:publish site-config))
 
-(defn print-config []
-  (println "---------------------------------------------------------------")
-  (println "Tekdoc - Config")
-  (println "Content        : " content-root)
-  (println "Static Content : " static-root)
-  (println "Output         : " output-root)
-  (println "Publish to     : " publish-root)
-  (println "---------------------------------------------------------------"))
+(defn init-config! [site-config-file]
+  (println "[init-config!] site-config-file : " site-config-file)
+  (let [site-config (first  (yaml/parse-string (slurp (expand-home site-config-file))))
+        new-config {:config-source site-config-file
+                    :scm-root (:scm site-config)
+                    :content-root (resolve-relative-path site-config-file (:content site-config))
+                    :static-root (resolve-relative-path site-config-file (:static site-config))
+                    :output-root (resolve-relative-path site-config-file (:output site-config))
+                    :layouts-root (resolve-relative-path site-config-file (:layouts site-config))
+                    :publish-root (:publish site-config)}]
+    (swap! -config merge new-config)))
+
+(defn debug-config []
+  (let [{:keys [:config-source :scm-root :content-root
+                :static-root :output-root :publish-root]} (get-config)]
+    (str  "---------------------------------------------------------------\n"
+          "Site config    : " config-source "\n"
+          "---------------------------------------------------------------\n"    
+          "SCM            : " scm-root "\n"
+          "Content        : " content-root "\n"
+          "Static Content : " static-root "\n"
+          "Output         : " output-root "\n"
+          "Publish to     : " publish-root "\n"
+          "---------------------------------------------------------------\n")))
 
 (defn initialise! [site-config-file]
-  (print-config)
-  (selmer/set-resource-path! content-root)
+  (init-config! site-config-file)
+  (println (debug-config))
+  (let [{:keys [:content-root]} (get-config)]
+    (selmer/set-resource-path! content-root)
 
-  ;; We never want caching on for now
-  (selmer/cache-off!)
+    (println "Initialised selmer to : " content-root)
 
-  (jade/configure {:template-dir content-root
-                 :pretty-print true
-                 :cache? false}))
+    ;; We never want caching on for now
+    (selmer/cache-off!)
+
+    (jade/configure {:template-dir content-root
+                     :pretty-print true
+                     :cache? false})
+    (println "Initialised jade to   : " content-root)))
 

@@ -6,16 +6,24 @@ COMMAND=$1
 SITE_CONFIG=$2
 
 install() {
-    echo "tekdoc - Installing..."
+    echo "tekdoc [install] - Installing to ~/.tekdoc"
     mkdir -p ~/.tekdoc
     cp target/publisher-0.1.0-SNAPSHOT-standalone.jar ~/.tekdoc/tekdoc.jar
     cp tekdoc.sh ~/.tekdoc
+    echo "tekdoc [install] - Completed OK"
 }
 
 publish() {
-    echo "Using site config ${SITE_CONFIG}"
+    echo "tekdoc [publish] - Using site config [${SITE_CONFIG}]"
     #export JAVA_CMD="-cp ~/.tekdoc/tekdoc.jar publisher.publish"
-    java -cp ~/.tekdoc/tekdoc.jar publisher.publish
+    java -cp ~/.tekdoc/tekdoc.jar publisher.publish ${SITE_CONFIG}
+    if [ $? -eq 0 ]; then
+        echo "tekdoc [publish] - Completed OK"
+        exit 0
+    else
+        echo "tekdoc [publish] - Failed to Publish!"
+        exit -1        
+    fi    
 }
 
 ci() {

@@ -104,6 +104,7 @@
 (defmethod process-page :png [export-root page-file]
   (let [output-file (make-output-file export-root page-file :png)]
     (println (str "[png] " (:relative-filename page-file) " -> " output-file))
+    (fs/mkdirs (fs/parent output-file))
     (fs/copy (:filepath page-file) output-file)))
 
 
@@ -148,17 +149,16 @@
     (dorun (map (partial copy-static output-root) list-of-files))))
 
 
-(defn export-site [export-root content-root]  
-  (.mkdirs (clojure.java.io/file export-root))
-  (fs/delete-dir config/output-root)
-  (fs/mkdirs config/output-root)
-  (copy-static-site-files config/static-root config/output-root)
-  (process-page-files export-root (list-page-files config/content-root)))
+(defn export-site [output-root content-root static-root]  
+  (fs/delete-dir output-root)
+  (fs/mkdirs output-root)
+  (copy-static-site-files static-root output-root)
+  (process-page-files output-root (list-page-files content-root)))
 
 
 
 (defn -main [& args]
   (let [site-config-file (first args)]
-    (config/initialise! site-config-file))  
-  (export-site config/output-root config/content-root)
-)
+    (config/initialise! site-config-file))
+  (let [{:keys [:output-root :content-root :static-root]} (config/get-config)]
+    (export-site output-root content-root static-root)))

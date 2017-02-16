@@ -54,9 +54,12 @@
 
 (defn trigger-ci [request]
   (pprint (:body  request))
-  (pull-from-git config/content-root)
-  (publish/export-site config/output-root config/content-root)
-  (publish-site config/output-root config/publish-root)
+  
+  (let [{:keys [:content-root :output-root :publish-root]} (config/get-config)]
+    (pull-from-git content-root)
+    (publish/export-site output-root content-root)
+    (publish-site output-root publish-root))
+  
   (response { :is ["message"] :text "Just published the website!"}))
 
 (defroutes app-routes
@@ -71,7 +74,6 @@
 (defn -main [& args]
   (if (not (empty? args))
     (let [site-config-file (first args)]
-    (config/initialise! site-config-file)))
+      (config/initialise! site-config-file)))
     
-  (jetty/run-jetty app {:port 8087})
-)
+  (jetty/run-jetty app {:port 8087}))
